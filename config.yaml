@@ -1,0 +1,137 @@
+# AgentTrove token-cost prediction benchmark — every constant of spec §14 lives here.
+# Deviations from the spec defaults are marked "DEV" and explained in results/DEVIATIONS.md.
+
+seed: 20261101
+
+data:
+  hf_repo: open-thoughts/AgentTrove
+  raw_dir: /home/user/hf_raw          # local copies of the 38 Parquet shards
+  local_parquet_glob: /home/user/hf_raw/train-*.parquet
+  meta_dir: data_cache/meta
+  cache_dir: data_cache
+
+selection:
+  n_runs_max: 100000                  # DEV: spec 300,000; reduced for a 4-core / 15 GB machine
+  n_min_cell: 2
+  n_runs_cell_cap: 32
+  cap_per_source_frac: 0.05
+  cap_per_source_min: 2000
+  crossed_target_share: 0.40
+  agent: terminus-2
+  keep_trace_sources: [main]          # summarization sub-call rows are not trials (E0)
+
+exclusion:
+  max_message_chars: 2000000
+
+cost:
+  tokenizer: o200k_base
+  c_msg: 4
+  lambda_c: 0.1
+  lambda_o: 4.0
+  lambda_o_hi: 8.0
+
+# Filled from E0 (distinct raw values -> canonical model id)
+model_aliases: {}
+
+# success label mapping for `result` (E0 lists distinct values). No `reward` column exists.
+success:
+  error_results_are_failure: true
+  completed_requires_task_complete: true
+
+source_family: {}                     # filled from E0: source -> family
+
+quantile_grid_n: 99
+p3_levels: [0.01, 0.025, 0.05, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 0.95, 0.975, 0.99]
+p1_shrinkage_n0: 30
+
+evt:
+  threshold_q: 0.90
+  min_exceedances: 200
+
+mdn:
+  K: 3
+  K_ablation: [1, 2, 3]
+  hidden: [128, 128]
+  dropout: 0.1
+  lr: 0.001
+  weight_decay: 0.0001
+  batch: 512
+  max_epochs: 100
+  patience: 10
+  sd_floor: 0.05
+  seeds: 3
+
+p5:
+  mc_draws: 2000
+  max_person_period_rows: 2000000
+  seeds: 3
+
+p6:
+  ridge_alphas: [0.1, 1, 10, 100]
+
+p2:
+  c_grid: [0.5, 2.0, 0.01]
+
+online:
+  k_grid: [1, 2, 4, 8, 16, 32]
+  panel_min_K: 33
+
+cv:
+  n_splits: 5
+  inner_fit: 0.70
+  inner_val: 0.15
+  inner_cal: 0.15
+
+warm:
+  min_cell_runs: 6
+
+oracle:
+  min_cell_runs: 10
+
+bootstrap:
+  B: 1000
+  B_mixed: 200
+
+aci:
+  alpha: 0.1
+  gamma: 0.005
+  window: 500
+  clip: [0.001, 0.5]
+
+hyperparams:
+  n_configs: 20
+  search_space:
+    num_leaves: [15, 31, 63, 127]
+    learning_rate: [0.02, 0.05, 0.1]
+    min_child_samples: [20, 50, 100, 200]
+    feature_fraction: [0.6, 0.8, 1.0]
+    bagging_fraction: [0.7, 0.9, 1.0]
+    lambda_l2: [0, 1, 10]
+  early_stopping: 100
+  max_estimators: 5000
+
+features:
+  tfidf_min_df: 5
+  tfidf_max_features: 200000
+  svd_dim: 128
+  keywords: [test, fix, bug, implement, refactor, install, compile, error, performance, multiple files]
+  error_patterns: ["Traceback", "Error", "error:", "command not found", "No such file", "FAILED", "Permission denied"]
+
+llm_predictor:
+  enabled: false
+  small_model: claude-haiku-5-5
+  large_model: claude-sonnet-5-5
+  n_cells: 1000
+  calibration_cells: 300
+  max_instruction_tokens: 6000
+  prompt: |
+    You are estimating the token usage of an LLM agent run. The agent harness is terminus-2:
+    at every turn it sends the FULL conversation so far (system prompt, task, all previous
+    assistant messages and terminal outputs) to the model, and the model replies with a JSON
+    object of shell commands. Agent model: {model}. Benchmark source: {source}.
+    Task instruction:
+    {instruction}
+    Estimate the total number of tokens processed over the whole run (sum over turns of input
+    plus output tokens). Reply with only a JSON object {{"p10": int, "p50": int, "p90": int}}.
+
+n_jobs: 4

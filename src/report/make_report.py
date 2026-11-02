@@ -429,8 +429,12 @@ def e9_section() -> str:
                     ("fig_e9_nta_distribution.png", "Cumulative distribution of per-run NTA (log scale).")]:
         L.append(f"![{fn}](figures/{fn})\n")
         L.append(f"*{cap}*\n")
-    L.append("**E9 sanity checks**:\n")
-    L.append(md_table(san.round(4)) + "\n")
+    L.append("**E9 sanity checks** (§A.7; 4a re-scores the base per-k O2 forecasts through the E9 pipeline, 4b is "
+             "informative: the pooled O2 used in E9 is less accurate than the base per-k models at the grid points):\n")
+    sd = san.copy()
+    for c in ["value_a", "value_b", "lo_b", "hi_b"]:
+        sd[c] = sd[c].map(lambda v: f"{v:,.0f}" if pd.notna(v) and abs(v) >= 1000 else (d3(v) if pd.notna(v) else "—"))
+    L.append(sd.to_markdown(index=False, disable_numparse=True) + "\n")
     L.append("**Diagnostics** (infeasible = any quantile below the cost already spent, before correction; O1 source "
              "shares; forecasts with k > 64 use k = 64 in O2-pooled):\n")
     L.append(md_table(diag.round(4)) + "\n")

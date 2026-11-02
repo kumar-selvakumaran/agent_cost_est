@@ -214,7 +214,7 @@ def main():
          f"**H2 ({h2})**: relative CRPS gain of {best} vs P1 = {g['gain']:.3f} ({g['gain_lo']:.3f}, {g['gain_hi']:.3f}); "
          f"Holm p = {row.p_holm:.3g}.\n",
          f"**H3 ({h3})**: PIT KS P2 = {bestng.ks_P2:.3f}; " + "; ".join(
-             f"{r.method} = {r.ks:.3f} (diff {r['diff']:.3f} [{r.lo:.3f}, {r.hi:.3f}])" for r in h3t.itertuples()) + "\n"]
+             f"{r.method} = {r.ks:.3f} (diff {getattr(r, 'diff'):.3f} [{r.lo:.3f}, {r.hi:.3f}])" for r in h3t.itertuples()) + "\n"]
     write_log("e3", L)
     print("\n".join(L))
 

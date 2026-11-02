@@ -1,0 +1,6 @@
+component,val_score,n_configs,num_leaves,learning_rate,min_child_samples,feature_fraction,bagging_fraction,lambda_l2
+P2_mean,0.37679146288846693,20,15,0.02,100,0.6,1.0,10
+P2_var,0.32608941560608434,20,63,0.02,200,0.6,0.9,1
+P3,0.1209460388222989,20,31,0.02,50,0.8,0.9,10
+P5_haz,0.19480298662392959,20,127,0.05,50,0.8,0.9,10
+P5_cost,0.07464298215083277,20,63,0.02,20,0.8,1.0,10

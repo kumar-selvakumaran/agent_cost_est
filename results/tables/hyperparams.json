@@ -1,0 +1,62 @@
+{
+ "P2_mean": {
+  "hp": {
+   "num_leaves": 15,
+   "learning_rate": 0.02,
+   "min_child_samples": 100,
+   "feature_fraction": 0.6,
+   "bagging_fraction": 1.0,
+   "lambda_l2": 10
+  },
+  "val_score": 0.37679146288846693,
+  "n_configs": 20
+ },
+ "P2_var": {
+  "hp": {
+   "num_leaves": 63,
+   "learning_rate": 0.02,
+   "min_child_samples": 200,
+   "feature_fraction": 0.6,
+   "bagging_fraction": 0.9,
+   "lambda_l2": 1
+  },
+  "val_score": 0.32608941560608434,
+  "n_configs": 20
+ },
+ "P3": {
+  "hp": {
+   "num_leaves": 31,
+   "learning_rate": 0.02,
+   "min_child_samples": 50,
+   "feature_fraction": 0.8,
+   "bagging_fraction": 0.9,
+   "lambda_l2": 10
+  },
+  "val_score": 0.1209460388222989,
+  "n_configs": 20
+ },
+ "P5_haz": {
+  "hp": {
+   "num_leaves": 127,
+   "learning_rate": 0.05,
+   "min_child_samples": 50,
+   "feature_fraction": 0.8,
+   "bagging_fraction": 0.9,
+   "lambda_l2": 10
+  },
+  "val_score": 0.19480298662392959,
+  "n_configs": 20
+ },
+ "P5_cost": {
+  "hp": {
+   "num_leaves": 63,
+   "learning_rate": 0.02,
+   "min_child_samples": 20,
+   "feature_fraction": 0.8,
+   "bagging_fraction": 1.0,
+   "lambda_l2": 10
+  },
+  "val_score": 0.07464298215083277,
+  "n_configs": 20
+ }
+}

@@ -38,6 +38,14 @@ def success_label(result, judgment, split):
     return np.nan
 
 
+def add_turn_derived(turns: pd.DataFrame) -> pd.DataFrame:
+    """Cumulative tokens N_k and input size of the next call I_{k+1} (null after the last call)."""
+    turns["n_tok"] = turns.I + turns.O
+    turns["cum_tokens"] = turns.groupby("run_id").n_tok.cumsum()
+    turns["I_next"] = turns.groupby("run_id").I.shift(-1).astype("Int64")
+    return turns
+
+
 def concat_parts(cache):
     parts = os.path.join(cache, "parts")
     runs = pd.concat([pd.read_parquet(f) for f in sorted(glob.glob(os.path.join(parts, "runs_*.parquet")))],
@@ -77,6 +85,7 @@ def build(cfg):
                       ignore_index=True)
     turns = turns.merge(r[["uid", "run_id"]], on="uid", how="inner").drop(columns="uid")
     turns = turns.sort_values(["run_id", "k"]).reset_index(drop=True)
+    turns = add_turn_derived(turns)
     turns.to_parquet(os.path.join(cache, "turns.parquet"), index=False)
     print("runs", len(r), "turns", len(turns))
     return r

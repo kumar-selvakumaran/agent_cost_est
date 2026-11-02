@@ -58,8 +58,8 @@ def gbm_frame(runs: pd.DataFrame, num: pd.DataFrame, Z: np.ndarray | None, train
             if c.startswith("kw_"):
                 X[c] = num[c].values
     if feature_set == "full" and Z is not None:
-        for j in range(Z.shape[1]):
-            X[f"svd{j}"] = Z[:, j]
+        S = pd.DataFrame(Z, index=X.index, columns=[f"svd{j}" for j in range(Z.shape[1])])
+        X = pd.concat([X, S], axis=1)
     return X
 
 

@@ -56,7 +56,7 @@ def main():
     # secondary targets: retrain P1 and best
     for tgt, exp in [("y_tok", "e3tok"), ("y_hi", "e3hi")]:
         for f in range(cfg["cv"]["n_splits"]):
-            fit_fold(cfg, runs, splits, f, exp=exp, methods=["P1", best], target=tgt, n_seeds=1)
+            fit_fold(cfg, runs, splits, f, exp=exp, methods=["P1", best], target=tgt, n_seeds=1, pred_roles=("test",))
         i1, t1 = pooled(exp, "P1", runs, tgt)
         _, tb = pooled(exp, best, runs, tgt)
         add(f"target {tgt}", "P1", i1, t1)
@@ -76,7 +76,7 @@ def main():
         sp = splits.copy()
         sp["role_loso"] = role
         tag = "loso_" + fam.replace(" ", "_")
-        fit_fold(cfg, runs, sp, 0, exp=tag, methods=["P1", best], group_col="role_loso", svd_tag=tag, n_seeds=1)
+        fit_fold(cfg, runs, sp, 0, exp=tag, methods=["P1", best], group_col="role_loso", svd_tag=tag, n_seeds=1, pred_roles=("test",))
         for m in ["P1", best]:
             d = load_pred(tag, m, 0)
             rid = d["test_run_id"].astype(np.int64)
@@ -89,7 +89,7 @@ def main():
     for fs, label in [("a", "(a) model + source only"), ("b", "(b) + numeric text stats"), ("c", "(c) + keywords")]:
         exp = "e3abl" + fs
         for f in range(cfg["cv"]["n_splits"]):
-            fit_fold(cfg, runs, splits, f, exp=exp, methods=[best], feature_set=fs, n_seeds=1)
+            fit_fold(cfg, runs, splits, f, exp=exp, methods=[best], feature_set=fs, n_seeds=1, pred_roles=("test",))
         i_, s_ = pooled(exp, best, runs, "y")
         add("ablation " + label, best, i_, s_)
     add("ablation (d) + TF-IDF/SVD (full)", best, ids, sb)

@@ -221,20 +221,22 @@ Crossed design: tasks with ≥ 2 models each having ≥ 4 runs (models with < 20
 
 **Metrics.** *QCRPS* approximates the continuous ranked probability score from the 99 quantiles: (2/99) Σ_j ρ_τj(y − q_j), the average pinball loss over all levels; it rewards calibration and sharpness together, is in log-cost units, and lower is better (for a point forecast it reduces to absolute error). *PIT* is the forecast CDF evaluated at the outcome; it is uniform when the forecast is calibrated, and PIT KS is its Kolmogorov–Smirnov distance from uniform. *Coverage* is the share of outcomes inside a central interval. Primary aggregate: mean QCRPS within task, then across tasks. CIs: task-cluster bootstrap (B = 1,000).
 
-| Method               | QCRPS task-wt (CI)       | QCRPS run-wt   | Gain vs P1              | Pinball .5 / .9 / .99   | Spearman   | MAE (log)   | Cov 80 / 90 / 95      |   Width 10–90 | PIT KS      |   DQ p (τ=.9) |
-|:---------------------|:-------------------------|:---------------|:------------------------|:------------------------|:-----------|:------------|:----------------------|--------------:|:------------|--------------:|
-| P0 global            | 0.612 (0.606, 0.617)     | 0.492          | -66.1% (-67.7%, -64.3%) | 0.446 / 0.159 / 0.024   | 0.21       | 0.891       | 0.708 / 0.846 / 0.923 |          2.27 | **0.00169** |             0 |
-| P1 source × model    | 0.369 (0.365, 0.372)     | 0.370          | 0.0% (0.0%, 0.0%)       | 0.257 / 0.109 / 0.016   | 0.576      | 0.513       | 0.796 / 0.898 / 0.95  |          1.61 | 0.00199     |             0 |
-| P2 hetero log-normal | 0.320 (0.316, 0.323)     | 0.336          | 13.3% (12.8%, 13.8%)    | 0.221 / 0.100 / 0.019   | **0.676**  | 0.442       | 0.802 / 0.891 / 0.934 |          1.35 | 0.0164      |             0 |
-| P3 quantile GBM      | 0.315 (0.312, 0.318)     | 0.334          | 14.5% (14.0%, 15.0%)    | 0.217 / 0.099 / 0.017   | 0.675      | 0.433       | 0.77 / 0.872 / 0.927  |          1.32 | 0.033       |             0 |
-| P3-EVT               | 0.315 (0.312, 0.318)     | 0.334          | 14.5% (14.0%, 15.0%)    | 0.217 / 0.099 / 0.017   | 0.675      | 0.433       | 0.79 / 0.888 / 0.941  |          1.39 | 0.033       |             0 |
-| P4 MDN (K = 3)       | 0.321 (0.317, 0.324)     | 0.338          | 13.0% (12.4%, 13.6%)    | 0.221 / 0.099 / 0.015   | 0.668      | 0.442       | 0.788 / 0.892 / 0.947 |          1.34 | 0.0226      |             0 |
-| P5 structural        | 0.314 (0.311, 0.317)     | **0.332**      | 14.8% (14.3%, 15.4%)    | 0.216 / 0.097 / 0.016   | 0.673      | **0.432**   | 0.825 / 0.912 / 0.956 |          1.4  | 0.0102      |             0 |
-| P6 linear            | 0.336 (0.333, 0.339)     | 0.349          | 8.9% (8.3%, 9.4%)       | 0.232 / 0.102 / 0.019   | 0.662      | 0.464       | 0.798 / 0.887 / 0.932 |          1.43 | 0.0149      |             0 |
-| P4 MDN (K = 1)       | 0.332 (0.329, 0.335)     | 0.343          | 10.0% (9.5%, 10.6%)     | 0.227 / 0.101 / 0.017   | 0.673      | 0.454       | 0.836 / 0.916 / 0.955 |          1.56 | 0.0308      |             0 |
-| P4 MDN (K = 2)       | 0.324 (0.320, 0.327)     | 0.337          | 12.2% (11.6%, 12.8%)    | 0.223 / 0.100 / 0.016   | 0.672      | 0.446       | 0.794 / 0.897 / 0.953 |          1.38 | 0.0168      |             0 |
-| CQR(P3-EVT)          | 0.315 (0.312, 0.318)     | 0.333          | 14.5% (14.0%, 15.0%)    | 0.217 / 0.099 / 0.017   | 0.675      | 0.433       | 0.805 / 0.9 / 0.952   |          1.42 | 0.022       |             0 |
-| CQR(P5)              | **0.314 (0.311, 0.317)** | 0.333          | 14.9% (14.3%, 15.4%)    | 0.216 / 0.098 / 0.016   | 0.673      | 0.432       | 0.8 / 0.899 / 0.951   |          1.33 | 0.0255      |             0 |
+| Method               | QCRPS task-wt (CI)       | QCRPS run-wt   | Gain vs P1              | Pinball .5 / .9 / .99   | Spearman   | MAE (log)   | Cov 80 / 90 / 95      |   Width 10–90 | PIT KS      | DQ p (τ=.9)   |
+|:---------------------|:-------------------------|:---------------|:------------------------|:------------------------|:-----------|:------------|:----------------------|--------------:|:------------|:--------------|
+| P0 global            | 0.612 (0.606, 0.617)     | 0.492          | -66.1% (-67.7%, -64.3%) | 0.446 / 0.159 / 0.024   | 0.21       | 0.891       | 0.708 / 0.846 / 0.923 |          2.27 | **0.00169** | <0.001        |
+| P1 source × model    | 0.369 (0.365, 0.372)     | 0.370          | 0.0% (0.0%, 0.0%)       | 0.257 / 0.109 / 0.016   | 0.576      | 0.513       | 0.796 / 0.898 / 0.95  |          1.61 | 0.00199     | <0.001        |
+| P2 hetero log-normal | 0.320 (0.316, 0.323)     | 0.336          | 13.3% (12.8%, 13.8%)    | 0.221 / 0.100 / 0.019   | **0.676**  | 0.442       | 0.802 / 0.891 / 0.934 |          1.35 | 0.0164      | <0.001        |
+| P3 quantile GBM      | 0.315 (0.312, 0.318)     | 0.334          | 14.5% (14.0%, 15.0%)    | 0.217 / 0.099 / 0.017   | 0.675      | 0.433       | 0.77 / 0.872 / 0.927  |          1.32 | 0.033       | <0.001        |
+| P3-EVT               | 0.315 (0.312, 0.318)     | 0.334          | 14.5% (14.0%, 15.0%)    | 0.217 / 0.099 / 0.017   | 0.675      | 0.433       | 0.79 / 0.888 / 0.941  |          1.39 | 0.033       | <0.001        |
+| P4 MDN (K = 3)       | 0.321 (0.317, 0.324)     | 0.338          | 13.0% (12.4%, 13.6%)    | 0.221 / 0.099 / 0.015   | 0.668      | 0.442       | 0.788 / 0.892 / 0.947 |          1.34 | 0.0226      | <0.001        |
+| P5 structural        | 0.314 (0.311, 0.317)     | **0.332**      | 14.8% (14.3%, 15.4%)    | 0.216 / 0.097 / 0.016   | 0.673      | **0.432**   | 0.825 / 0.912 / 0.956 |          1.4  | 0.0102      | <0.001        |
+| P6 linear            | 0.336 (0.333, 0.339)     | 0.349          | 8.9% (8.3%, 9.4%)       | 0.232 / 0.102 / 0.019   | 0.662      | 0.464       | 0.798 / 0.887 / 0.932 |          1.43 | 0.0149      | <0.001        |
+| P4 MDN (K = 1)       | 0.332 (0.329, 0.335)     | 0.343          | 10.0% (9.5%, 10.6%)     | 0.227 / 0.101 / 0.017   | 0.673      | 0.454       | 0.836 / 0.916 / 0.955 |          1.56 | 0.0308      | <0.001        |
+| P4 MDN (K = 2)       | 0.324 (0.320, 0.327)     | 0.337          | 12.2% (11.6%, 12.8%)    | 0.223 / 0.100 / 0.016   | 0.672      | 0.446       | 0.794 / 0.897 / 0.953 |          1.38 | 0.0168      | <0.001        |
+| CQR(P3-EVT)          | 0.315 (0.312, 0.318)     | 0.333          | 14.5% (14.0%, 15.0%)    | 0.217 / 0.099 / 0.017   | 0.675      | 0.433       | 0.805 / 0.9 / 0.952   |          1.42 | 0.022       | <0.001        |
+| CQR(P5)              | **0.314 (0.311, 0.317)** | 0.333          | 14.9% (14.3%, 15.4%)    | 0.216 / 0.098 / 0.016   | 0.673      | 0.432       | 0.8 / 0.899 / 0.951   |          1.33 | 0.0255      | <0.001        |
+
+The DQ test rejects for every method (p < 0.001): with ~98k runs, exceedances of the 90% quantile are predictable from model, source family and instruction length for all forecasters, i.e. each is miscalibrated in some identifiable sub-population even when overall coverage is close to nominal (per-group PIT/coverage in `e3_pit_by_group.csv`).
 
 Best value per column in bold (coverage: closest to nominal is not bolded; width: sharper is only better when calibrated). The best method was chosen on validation data before looking at test results: P5. Stochastic methods use the first pre-specified seed; across 3 seeds: P4 0.321 ± 0.000; P4-K1 0.331 ± 0.001; P4-K2 0.323 ± 0.000; P5 0.314 ± 0.000.
 
@@ -305,6 +307,49 @@ Best value per column in bold (coverage: closest to nominal is not bolded; width
 | CQR(best)   | mondrian  | upper 90%   |      0.9  |      0.89  | 0.885 | 0.895 |      nan     |
 | CQR(best)   | mondrian  | upper 95%   |      0.95 |      0.94  | 0.936 | 0.943 |      nan     |
 | CQR(best)   | mondrian  | upper 99%   |      0.99 |      0.987 | 0.985 | 0.988 |      nan     |
+
+**Sensitivity and ablation** (primary metric only):
+
+| analysis                                              | method   |   n_runs |   qcrps |    lo |    hi |   diff_vs_P1 |   diff_lo |   diff_hi |   rel_gain |   degradation_loso_minus_cv |
+|:------------------------------------------------------|:---------|---------:|--------:|------:|------:|-------------:|----------:|----------:|-----------:|----------------------------:|
+| primary target (reference)                            | P1       |    98501 |   0.369 | 0.365 | 0.372 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| primary target (reference)                            | P5       |    98501 |   0.314 | 0.311 | 0.317 |       -0.055 |    -0.057 |    -0.052 |      0.148 |                     nan     |
+| summarization-flagged runs excluded                   | P1       |    97054 |   0.367 | 0.364 | 0.371 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| summarization-flagged runs excluded                   | P5       |    97054 |   0.313 | 0.31  | 0.316 |       -0.054 |    -0.056 |    -0.052 |      0.147 |                     nan     |
+| hidden-reasoning models excluded (visible = billed)   | P1       |    71063 |   0.347 | 0.343 | 0.351 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| hidden-reasoning models excluded (visible = billed)   | P5       |    71063 |   0.315 | 0.312 | 0.319 |       -0.032 |    -0.034 |    -0.03  |      0.091 |                     nan     |
+| target y_tok                                          | P1       |    98501 |   0.533 | 0.528 | 0.537 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| target y_tok                                          | P5       |    98501 |   0.458 | 0.454 | 0.463 |       -0.074 |    -0.077 |    -0.072 |      0.14  |                     nan     |
+| target y_hi                                           | P1       |    98501 |   0.361 | 0.357 | 0.364 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| target y_hi                                           | P5       |    98501 |   0.308 | 0.305 | 0.311 |       -0.053 |    -0.055 |    -0.051 |      0.146 |                     nan     |
+| leave-family-out: code_repair                         | P1       |    20476 |   0.664 | 0.656 | 0.672 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| grouped-task CV on same runs: code_repair             | P1       |    20476 |   0.313 | 0.307 | 0.319 |      nan     |   nan     |   nan     |    nan     |                       0.351 |
+| leave-family-out: code_repair                         | P5       |    20476 |   0.59  | 0.581 | 0.598 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| grouped-task CV on same runs: code_repair             | P5       |    20476 |   0.286 | 0.28  | 0.291 |      nan     |   nan     |   nan     |    nan     |                       0.304 |
+| leave-family-out: competitive_programming             | P1       |       81 |   1.75  | 1.456 | 2.065 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| grouped-task CV on same runs: competitive_programming | P1       |       81 |   0.691 | 0.583 | 0.808 |      nan     |   nan     |   nan     |    nan     |                       1.059 |
+| leave-family-out: competitive_programming             | P5       |       81 |   1     | 0.796 | 1.23  |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| grouped-task CV on same runs: competitive_programming | P5       |       81 |   0.683 | 0.568 | 0.808 |      nan     |   nan     |   nan     |    nan     |                       0.316 |
+| leave-family-out: data_qa                             | P1       |    32946 |   0.468 | 0.462 | 0.474 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| grouped-task CV on same runs: data_qa                 | P1       |    32946 |   0.439 | 0.432 | 0.446 |      nan     |   nan     |   nan     |    nan     |                       0.029 |
+| leave-family-out: data_qa                             | P5       |    32946 |   0.636 | 0.623 | 0.647 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| grouped-task CV on same runs: data_qa                 | P5       |    32946 |   0.421 | 0.414 | 0.428 |      nan     |   nan     |   nan     |    nan     |                       0.215 |
+| leave-family-out: math                                | P1       |     2071 |   1.573 | 1.542 | 1.603 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| grouped-task CV on same runs: math                    | P1       |     2071 |   0.35  | 0.33  | 0.371 |      nan     |   nan     |   nan     |    nan     |                       1.223 |
+| leave-family-out: math                                | P5       |     2071 |   1.429 | 1.401 | 1.457 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| grouped-task CV on same runs: math                    | P5       |     2071 |   0.254 | 0.239 | 0.269 |      nan     |   nan     |   nan     |    nan     |                       1.175 |
+| leave-family-out: other                               | P1       |    31363 |   0.503 | 0.493 | 0.513 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| grouped-task CV on same runs: other                   | P1       |    31363 |   0.476 | 0.466 | 0.485 |      nan     |   nan     |   nan     |    nan     |                       0.027 |
+| leave-family-out: other                               | P5       |    31363 |   0.518 | 0.509 | 0.529 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| grouped-task CV on same runs: other                   | P5       |    31363 |   0.316 | 0.309 | 0.322 |      nan     |   nan     |   nan     |    nan     |                       0.202 |
+| leave-family-out: shell                               | P1       |    11564 |   0.817 | 0.804 | 0.828 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| grouped-task CV on same runs: shell                   | P1       |    11564 |   0.343 | 0.337 | 0.348 |      nan     |   nan     |   nan     |    nan     |                       0.474 |
+| leave-family-out: shell                               | P5       |    11564 |   0.651 | 0.643 | 0.658 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| grouped-task CV on same runs: shell                   | P5       |    11564 |   0.298 | 0.293 | 0.302 |      nan     |   nan     |   nan     |    nan     |                       0.353 |
+| ablation (a) model + source only                      | P5       |    98501 |   0.369 | 0.366 | 0.373 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| ablation (b) + numeric text stats                     | P5       |    98501 |   0.328 | 0.325 | 0.332 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| ablation (c) + keywords                               | P5       |    98501 |   0.328 | 0.324 | 0.331 |      nan     |   nan     |   nan     |    nan     |                     nan     |
+| ablation (d) + TF-IDF/SVD (full)                      | P5       |    98501 |   0.314 | 0.311 | 0.317 |      nan     |   nan     |   nan     |    nan     |                     nan     |
 
 **H3 detail** (PIT KS difference vs P2, paired task-cluster bootstrap):
 
@@ -443,10 +488,10 @@ Temporal split (dates cover 100% of runs): training = runs up to the 70th-percen
 
 ## 12. Threats to validity
 
-1. **Visible vs billed cost.** GPT-5-family runs show no reasoning tokens; their cost is a lower bound. Excluding them: not run. Per-model results: `e3_by_model.csv`.
-2. **Linear-history assumption.** 1.47% of runs are flagged for summarization. Excluding them: not run.
+1. **Visible vs billed cost.** GPT-5-family runs show no reasoning tokens; their cost is a lower bound. Excluding them: P1 0.347 vs P5 0.315 (relative gain 9.1%). Per-model results: `e3_by_model.csv`.
+2. **Linear-history assumption.** 1.47% of runs are flagged for summarization. Excluding them: P1 0.367 vs P5 0.313 (relative gain 14.7%).
 3. **Canonical tokenizer.** Model tokenizers differ from o200k_base by a near-constant factor (median ratios glm-4.6 1.01, glm-4.7 1.01, minimax-m2 1, qwen3-coder-480b 1.1), absorbed by the model features.
-4. **Pricing ratios.** Secondary targets: Y_tok — not run; Y_hi — not run.
+4. **Pricing ratios.** Secondary targets: Y_tok — P1 0.533 vs P5 0.458 (relative gain 14.0%); Y_hi — P1 0.361 vs P5 0.308 (relative gain 14.6%).
 5. **Selection.** Cells were sampled by source with a cap of 5,000 runs per source and crossed tasks first; composition vs the full dataset is in §3. Results describe this stratified sample (sources are weighted far more evenly than in AgentTrove, where exp_tas and freelancer dominate).
 6. **Training-data provenance.** AgentTrove was assembled as training data. No source has only successful labelled runs, but the success label is sparse and degenerate (it mostly records errors), so outcome filtering cannot be ruled out; several sources' run-length distributions are truncated by turn caps.
 7. **Leakage.** All learned transforms (TF-IDF/SVD, category levels, scaling, P2's c, EVT, conformal scores) are fit on training folds; folds are grouped by connected task-name/statement components; history features come from disjoint runs; tests assert no task, name or group overlap (`tests/test_splits.py`).
@@ -457,7 +502,7 @@ Temporal split (dates cover 100% of runs): training = runs up to the 70th-percen
 - Config hash: `42f49d36045c`; global seed 20261101 (component seeds = SEED + sha256(name) mod 10,000).
 - Python `3.13.18`; packages: `datasets==5.1.0, joblib==1.6.0, lightgbm==4.7.0, matplotlib==3.11.2, numpy==2.5.3, pandas==3.0.5, pyarrow==26.0.0, pytest==9.2.0, scikit-learn==1.9.1, scipy==1.18.1, statsmodels==0.15.0, tiktoken==0.14.0, tokenizers==0.23.3, torch==2.15.0+cpu`.
 - Hardware: 4 CPU cores, 15 GB RAM (spec target 16 cores / 64 GB; sample reduced to 100k runs).
-- Step run times (s): {}.
+- Step run times (s): `{'tests': 5.9, 'e6': 4.8, 'report': 1.0, 'e1': 32, 'e2': 720, 'e3_fit': 13500, 'e3_eval': 809, 'e4': 821, 'e5': 12729, 'e7': 582, 'e8': 62, 'e3_sens': 5820, '_note': 'e1-e8 times measured from the background-run logs on this 4-core machine'}`.
 - Regenerate everything from the cached data: `python -m src.run_all --config config.yaml`.
 - Hyperparameters chosen on fold-1 validation: `results/tables/hyperparams.csv`.
 - Deviations from the spec (summary): sample size 100k; no `reward` column (exploratory `completed` proxy for E1/E8); task identity by statement hash; ambiguous model strings excluded; summarization sub-calls dropped; O1/O2 reuse P5/P3 hyperparameters; CQR applied to every quantile pair to score it by QCRPS. Full list: `results/DEVIATIONS.md`.

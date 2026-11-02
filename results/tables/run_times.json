@@ -1,0 +1,15 @@
+{
+ "tests": 5.9,
+ "e6": 4.8,
+ "report": 1.0,
+ "e1": 32,
+ "e2": 720,
+ "e3_fit": 13500,
+ "e3_eval": 809,
+ "e4": 821,
+ "e5": 12729,
+ "e7": 582,
+ "e8": 62,
+ "e3_sens": 5820,
+ "_note": "e1-e8 times measured from the background-run logs on this 4-core machine"
+}

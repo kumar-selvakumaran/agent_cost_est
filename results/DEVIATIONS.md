@@ -107,3 +107,6 @@ The rule applied under ambiguity: choose the most conservative option (least lea
 32. **E6 skipped**: `llm_predictor.enabled` is false by default and no API key is configured (spec A.8); H5 = skipped.
 33. **Optional `h_last1`/`h_last5` history variant** (§6.2) not run: E0 did not establish that `date` orders runs
     within a cell (dates are per job batch for many sources).
+34. **E3 sensitivities refit the best method with one seed and score only the test role** (no val/cal predictions,
+    which these analyses do not use) to fit the compute budget. Leave-family-out uses 6 source families (the spec's
+    "other" family collects sources without a manual family).

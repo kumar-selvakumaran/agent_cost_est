@@ -226,7 +226,7 @@ def build() -> str:
                      "Pinball .5 / .9 / .99": f"{d3(r.pin50)} / {d3(r.pin90)} / {d3(r.pin99)}",
                      "Spearman": f3(r.spearman), "MAE (log)": f3(r.abs_err50),
                      "Cov 80 / 90 / 95": f"{f3(r.cov80)} / {f3(r.cov90)} / {f3(r.cov95)}",
-                     "Width 10–90": f3(r.width80), "PIT KS": f3(r.pit_ks), "DQ p (τ=.9)": f3(r.dq_p_90)})
+                     "Width 10–90": f3(r.width80), "PIT KS": f3(r.pit_ks), "DQ p (τ=.9)": ("<0.001" if r.dq_p_90 < 0.001 else f3(r.dq_p_90))})
     mt = pd.DataFrame(rows)
     # bold best per column (lowest for losses/KS/width, highest for Spearman; coverage closest to nominal)
     def bold_min(col, key, maximize=False, target=None):
@@ -242,6 +242,10 @@ def build() -> str:
     bold_min("MAE (log)", "abs_err50")
     bold_min("PIT KS", "pit_ks")
     L.append(md_table(mt) + "\n")
+    L.append("The DQ test rejects for every method (p < 0.001): with ~98k runs, exceedances of the 90% quantile are "
+             "predictable from model, source family and instruction length for all forecasters, i.e. each is "
+             "miscalibrated in some identifiable sub-population even when overall coverage is close to nominal "
+             "(per-group PIT/coverage in `e3_pit_by_group.csv`).\n")
     L.append(f"Best value per column in bold (coverage: closest to nominal is not bolded; width: sharper is only better "
              f"when calibrated). The best method was chosen on validation data before looking at test results: {best}. "
              "Stochastic methods use the first pre-specified seed; across 3 seeds: "
@@ -356,7 +360,7 @@ def build() -> str:
     L.append(f"- Config hash: `{config_hash()}`; global seed {cfg['seed']} (component seeds = SEED + sha256(name) mod 10,000).\n"
              f"- Python `{platform.python_version()}`; packages: `{', '.join(keep)}`.\n"
              f"- Hardware: 4 CPU cores, 15 GB RAM (spec target 16 cores / 64 GB; sample reduced to 100k runs).\n"
-             f"- Step run times (s): {times}.\n"
+             f"- Step run times (s): `{times}`.\n"
              f"- Regenerate everything from the cached data: `python -m src.run_all --config config.yaml`.\n"
              f"- Hyperparameters chosen on fold-1 validation: `results/tables/hyperparams.csv`.\n"
              "- Deviations from the spec (summary): sample size 100k; no `reward` column (exploratory `completed` proxy "

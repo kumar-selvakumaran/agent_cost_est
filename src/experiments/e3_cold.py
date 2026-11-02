@@ -61,11 +61,11 @@ def predict_roles(model, bundles: dict) -> dict:
 
 
 def fit_fold(cfg, runs, splits, f, exp="e3", methods=None, feature_set="full", target="y", group_col="fold",
-             svd_tag=None, n_seeds=None, extra=None):
+             svd_tag=None, n_seeds=None, extra=None, pred_roles=("val", "cal", "test")):
     fd = FoldData(cfg, runs, splits, f, feature_set, target, group_col, svd_tag, extra)
     fit, val, cal, test = (fd.bundle(r) for r in ["fit", "val", "cal", "test"])
     fitval = fd.bundle(["fit", "val"])
-    B = dict(val=val, cal=cal, test=test)
+    B = {r: b for r, b in dict(val=val, cal=cal, test=test).items() if r in pred_roles}
     n_cfg = cfg["hyperparams"]["n_configs"]
     methods = methods or ["P0", "P1", "P2", "P3", "P3-EVT", "P4", "P4-K1", "P4-K2", "P5", "P6"]
     seeds_for = lambda m: (n_seeds if n_seeds is not None else SEEDED.get(m, 1))

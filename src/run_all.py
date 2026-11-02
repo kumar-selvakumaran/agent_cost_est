@@ -29,6 +29,7 @@ STEPS = [
     ("e7", "src.experiments.e7_shift"),
     ("e8", "src.experiments.e8_replay"),
     ("e6", "src.experiments.e6_llm"),
+    ("e9", "src.experiments.e9_trajectory"),
     ("report", "src.report.make_report"),
 ]
 

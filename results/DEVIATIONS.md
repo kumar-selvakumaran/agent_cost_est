@@ -110,3 +110,25 @@ The rule applied under ambiguity: choose the most conservative option (least lea
 34. **E3 sensitivities refit the best method with one seed and score only the test role** (no val/cal predictions,
     which these analyses do not use) to fit the compute budget. Leave-family-out uses 6 source families (the spec's
     "other" family collects sources without a manual family).
+
+## Extension E9 (trajectory-integrated evaluation)
+Base-spec deviations that affect the extension, and how E9 adapts (read before E9 per extension §A.3):
+- Target, cost weights, k grid and folds are unchanged from the base spec; the best S1 method is P5 (E3 validation).
+- Base O1/O2 models were not persisted (only their forecasts), so E9 refits what it needs; base E5 per-k O1
+  forecasts are reused at grid k (exact same forecasts), the pooled O1 hazard elsewhere.
+E9-specific choices:
+35. **Static is scored uncorrected; all other methods are clipped at log C_k.** Extension §2.3 asks to clip every
+    method before scoring, but §5 defines Static ("never updated") and Static-truncated (clipped) as distinct and
+    sanity check §A.7.1 requires Static's ITS to equal its pre-run QCRPS, which only holds unclipped. Static's
+    infeasible-quantile share is still reported as a diagnostic. (Conflict internal to the extension; base unaffected.)
+36. **At d_0 every method uses the Static (P5) forecast** (O1/O2 define no k = 0 behaviour of their own).
+37. **O2-pooled training rows are subsampled**: at most 2 decision points per training run (uniform over its
+    k = 1..min(K−1, 64)), each run keeping total weight 1 spread over its sampled rows. With all rows (~600k per fold)
+    × 15 quantile levels × 2 variants × 5 folds the fit did not finish within the compute budget (first attempt with
+    4 rows/run took > 50 min for one variant of one fold).
+38. **O1 pooled hazard** is trained on person-period rows (run, k, j > k) for up to 2 sampled decision points per
+    training run (k ≤ 64, k as a feature via pf_k capped at 64), capped at 2M rows; its hazards are evaluated on every
+    j in (k, k+16] then ~8% geometric steps (interpolated in log j). The per-k base models are used at k ∈ {1, 2, 4,
+    8, 16, 32}; `O1_src` records which model produced each forecast (diagnostics table).
+39. **E9 sensitivity (b) for Y_tok / Y_hi** is computed for Static and Static-truncated only (from the E3 sensitivity
+    refits of P5 on those targets); refitting the online models for two extra targets was beyond the compute budget.

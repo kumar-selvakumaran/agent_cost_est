@@ -136,3 +136,15 @@ llm_predictor:
     plus output tokens). Reply with only a JSON object {{"p10": int, "p50": int, "p90": int}}.
 
 n_jobs: 4
+
+# Extension 1 — trajectory-integrated evaluation (E9)
+e9:
+  pooled_o2_max_k: 64
+  its_weight: I_next            # input tokens of the next call, I_{k+1}
+  its_early_window: 8           # decision points k <= 7
+  ttc_tolerance_log: 0.22314355 # log(1.25)
+  logR_floor: 1
+  example_seed_offset: 9        # SEED + 9
+  bootstrap_B: 1000
+  o2_rows_per_run: 2            # DEV: subsample of decision points per training run (weight 1 per run)
+  o1_pooled_k_per_run: 2

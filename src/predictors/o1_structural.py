@@ -90,3 +90,32 @@ def online_state(turns: pd.DataFrame, k: int) -> pd.DataFrame:
     st["I_1"] = g.I.first().loc[st.index]
     st["O_mean"] = g.O.mean().loc[st.index]
     return st
+
+
+def e9_grid(k: int, jmax: int) -> np.ndarray:
+    """Hazard evaluation grid for a decision point at k: every j in (k, k+16], then ~8% geometric steps to jmax."""
+    g = list(range(k + 1, min(k + 16, jmax) + 1))
+    j = g[-1] if g else k + 1
+    while j < jmax:
+        j = max(j + 1, int(round(j * 1.08)))
+        g.append(min(j, jmax))
+    return np.unique(np.array(g, dtype=int))
+
+
+def o1_quantiles_at_k(haz_model, k: int, X: pd.DataFrame, kcap: np.ndarray, state: pd.DataFrame, jmax: int, M: int,
+                      rng, lam_c=0.1, lam_o=4.0) -> np.ndarray:
+    """O1 forecast for rows that all sit at decision point k (X: pre-run + prefix features at k; state rows aligned)."""
+    jmax = max(jmax, k + 2)
+    grid = e9_grid(k, jmax)
+    hz = hazard_matrix(haz_model, X.reset_index(drop=True), grid, kcap)
+    full_grid = np.r_[np.arange(1, k + 1), grid]
+    hz_full = np.c_[np.full((len(X), k), 0.5), hz]
+    Ks = sample_K(hz_full, full_grid, kcap, jmax, M, rng, start_after=k)
+    out = np.empty((len(X), 99), dtype=np.float32)
+    s = state
+    for i in range(len(X)):
+        extra = Ks[i] - k
+        R = remaining_cost_table(s.I_k[i], s.O_k[i], s.obs_k[i], s.I_1[i], s.O_mean[i], k, int(extra.max()),
+                                 lam_c, lam_o)
+        out[i] = np.quantile(np.log(s.C_k[i] + R[extra - 1]), TAUS)
+    return out

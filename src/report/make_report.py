@@ -127,6 +127,16 @@ def build() -> str:
         rows.append(dict(Hypothesis="H6 history beats text", Verdict=h6.verdict,
                          **{"Key statistic (95% CI)": f"relative gain (history, {h6.best_history_method}) − relative gain "
                                                      f"(text) = {ci(h6['diff'], h6.lo, h6.hi)}"}, Experiment="E3, E4"))
+    if opt("h7_h9.csv"):
+        hh = rd("h7_h9.csv").set_index("hypothesis")
+        names = {"H7": "H7 updating pays", "H8": "H8 stuck detection pays", "H9": "H9 learned beats mechanical"}
+        for h in ["H7", "H8", "H9"]:
+            r = hh.loc[h]
+            stat = f"{r.stat} = {ci(r.est, r.lo, r.hi)}; Holm p = {f3(r.p_holm)}"
+            if h == "H8":
+                stat += (f"; relative gap ITS-early {pct(r.gap_early)} vs ITS {pct(r.gap_its)}, difference "
+                         f"{ci(r.gap_diff, r.gap_diff_lo, r.gap_diff_hi)}")
+            rows.append({"Hypothesis": names[h], "Verdict": r.verdict, "Key statistic (95% CI)": stat, "Experiment": "E9"})
     L.append(md_table(pd.DataFrame(rows)) + "\n")
 
     # ---------------- 3. Data
@@ -311,6 +321,10 @@ def build() -> str:
         L.append("![crps vs k](figures/fig_e5_crps_vs_k.png)\n")
         L.append("*QCRPS vs number of observed turns k, for both populations (bands: 95% CIs), and 90% coverage vs k.*\n")
 
+    # ---------------- 8b. E9
+    if opt("e9_main.csv"):
+        L.append(e9_section())
+
     # ---------------- 9. Capacity
     L.append("## 9. Capacity (E6)\n")
     L.append(open("results/logs/e6.md").read().split("\n", 1)[1] + "\n")
@@ -367,6 +381,59 @@ def build() -> str:
              "for E1/E8); task identity by statement hash; ambiguous model strings excluded; summarization sub-calls "
              "dropped; O1/O2 reuse P5/P3 hyperparameters; CQR applied to every quantile pair to score it by QCRPS. "
              "Full list: `results/DEVIATIONS.md`.\n")
+    return "\n".join(L)
+
+
+def e9_section() -> str:
+    m = rd("e9_main.csv")
+    comp = rd("e9_comparisons.csv")
+    san = rd("e9_sanity.csv")
+    diag = rd("e9_diagnostics.csv")
+    L = ["## 8b. Trajectory-integrated evaluation (E9)\n",
+         "**ITS** (Integrated Trajectory Score) is the QCRPS of the log total-cost forecast averaged over every decision "
+         "point of every run (immediately before each model call), weighted by the input tokens of the upcoming call — "
+         "a proper, distributional version of the area between the forecast and true remaining-cost curves on the "
+         "token clock; lower is better. **NTA** (Normalized Trajectory Area) is that literal area for the median "
+         "forecast, divided by the run's total tokens and cost: NTA = 0.3 means the remaining-cost forecast was off "
+         "by 30% of the run's cost on average over its tokens; it is intuitive but improper (it rewards "
+         "under-forecasting) and is not used to rank methods.\n"]
+    t = pd.DataFrame({
+        "Method": m.method,
+        "ITS (CI)": [ci(a, b, c, d3) for a, b, c in zip(m.ITS, m.ITS_lo, m.ITS_hi)],
+        "ITS-rb": m.ITS_rb.map(d3), "ITS-early": m.ITS_early.map(d3), "ITS-turn": m.ITS_turn.map(d3),
+        "ITS-logR": m.ITS_logR.map(d3),
+        "NTA mean (CI)": [ci(a, b, c) for a, b, c in zip(m.NTA_mean, m.NTA_lo, m.NTA_hi)],
+        "NTA median": m.NTA_median.map(f3), "PIT KS": m.PIT_KS_w.map(f3),
+        "Infeasible %": m.infeasible_pct.map(lambda v: f"{v:.1f}"),
+        "Time to confidence (median)": m.ttc_median.map(f3)})
+    L.append(md_table(t) + "\n")
+    L.append("ITS-level (natural-scale QCRPS, reference units) and the share of runs that never reach ±25% confidence "
+             "are in `results/tables/e9_main.csv`; per model and per source family in `e9_by_model.csv`, "
+             "`e9_by_source_family.csv`; sensitivity in `e9_sensitivity.csv`.\n")
+    L.append("**Comparisons** (paired task-cluster bootstrap, Holm-corrected):\n")
+    L.append(md_table(comp.assign(diff=comp["diff"].map(d3), lo=comp.lo.map(d3), hi=comp.hi.map(d3),
+                                  p=comp.p.map(f3), p_holm=comp.p_holm.map(f3))) + "\n")
+    # ranking agreement paragraph
+    ranks = {k: list(m.sort_values(k).method) for k in ["ITS", "ITS_rb", "ITS_logR", "NTA_mean"]}
+    agree = all(r == ranks["ITS"] for r in ranks.values())
+    L.append("**Ranking agreement.** " + ("ITS, ITS-rb, ITS-logR and NTA rank the five methods identically: "
+             + " < ".join(ranks["ITS"]) + "." if agree else
+             "The metrics rank methods differently — " + "; ".join(f"{k}: {' < '.join(v)}" for k, v in ranks.items())
+             + ". ITS is the authoritative comparison; ITS-logR emphasizes late-run relative accuracy, and NTA is "
+             "improper (it rewards under-forecasting), so disagreements with them do not change the verdicts.") + "\n")
+    for fn, cap in [("fig_e9_example_trajectories.png", "Six runs drawn at random (seed SEED + 9), one per sextile of K: "
+                     "true remaining cost (black) and forecast medians; the shaded band is O2's NTA area."),
+                    ("fig_e9_error_vs_progress.png", "Mean QCRPS of the total-cost forecast by decile of the normalized token clock."),
+                    ("fig_e9_coverage_vs_progress.png", "Coverage of the central 80% interval by progress decile (dashed: nominal)."),
+                    ("fig_e9_width_vs_progress.png", "Mean width of the 10–90% interval by progress decile."),
+                    ("fig_e9_nta_distribution.png", "Cumulative distribution of per-run NTA (log scale).")]:
+        L.append(f"![{fn}](figures/{fn})\n")
+        L.append(f"*{cap}*\n")
+    L.append("**E9 sanity checks**:\n")
+    L.append(md_table(san.round(4)) + "\n")
+    L.append("**Diagnostics** (infeasible = any quantile below the cost already spent, before correction; O1 source "
+             "shares; forecasts with k > 64 use k = 64 in O2-pooled):\n")
+    L.append(md_table(diag.round(4)) + "\n")
     return "\n".join(L)
 
 

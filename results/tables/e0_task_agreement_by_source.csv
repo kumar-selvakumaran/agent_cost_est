@@ -1,0 +1,27 @@
+source,name_text_agreement
+Glaive Code Assistant,1.0
+Inferred Bugs,0.981
+MagiCoder Evol Instruct,1.0
+Nemotron Prism,1.0
+Qasper,1.0
+SWEGym,1.0
+Self-Instruct Naive,1.0
+StackExchange Overflow,1.0
+WikiTable Format Conversion,1.0
+bash textbook,1.0
+code_contests,1.0
+codeforces,1.0
+defects 4j,1.0
+exp_tas,1.0
+freelancer,0.881
+gsm8k,1.0
+math,1.0
+neulab,0.985
+nl2bash,1.0
+puzzles,0.786
+r2egym,1.0
+stack_exchange,1.0
+staqc,1.0
+swesmith,0.679
+taskmaster,1.0
+unknown,0.956

@@ -1,0 +1,13 @@
+step,rows_remaining
+all dataset rows,1696847
+agent == terminus-2,1559967
+drop summarization sub-call rows (trace_source summarization-*),1513835
+model_id resolvable (drop ambiguous `model`),1490258
+"1. transcript parseable: non-empty, first user message holds the task statement",1486116
+2. >= 1 assistant turn,1486116
+3a. one row per trial (longest episode snapshot kept),1174419
+3b. drop exact duplicate transcripts,1174419
+"4. no message > 2,000,000 chars",1174419
+"selected (cells with >= 2 runs, stratified, <= 32 runs/cell)",98501
+post-load: transcript parse failures,98501
+post-load: zero assistant turns after parsing,98501

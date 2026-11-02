@@ -1,0 +1,22 @@
+source,runs,cells,tasks
+Inferred Bugs,5000,2500,2500
+Nemotron Prism,44,22,22
+Qasper,5416,1352,676
+StackExchange Overflow,5000,2500,2500
+WikiTable Format Conversion,72,35,35
+bash textbook,1542,622,622
+code_contests,63,21,21
+codeforces,18,8,4
+defects 4j,5582,474,237
+exp_tas,15873,523,523
+freelancer,4999,545,523
+math,88,44,44
+neulab,4999,1106,1106
+nl2bash,5000,2500,2500
+puzzles,1939,927,925
+r2egym,5000,2500,2500
+stack_exchange,22458,1360,523
+staqc,22,11,11
+swesmith,4894,2561,2537
+taskmaster,5000,2498,2417
+unknown,5492,1656,1656

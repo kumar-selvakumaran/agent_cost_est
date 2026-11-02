@@ -17,6 +17,7 @@ selection:
   cap_per_source_frac: 0.05
   cap_per_source_min: 2000
   crossed_target_share: 0.40
+  crossed_max_share: 0.50
   agent: terminus-2
   keep_trace_sources: [main]          # summarization sub-call rows are not trials (E0)
 

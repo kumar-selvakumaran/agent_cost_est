@@ -1,0 +1,12 @@
+,value
+runs,98501.0
+tasks,20848.0
+cells,22962.0
+models,10.0
+sources,21.0
+crossed_tasks,1579.0
+runs_from_crossed,0.5130607811088213
+cells_ge6,2890.0
+cells_ge10,2600.0
+cells_ge20,1099.0
+split_groups,20394.0

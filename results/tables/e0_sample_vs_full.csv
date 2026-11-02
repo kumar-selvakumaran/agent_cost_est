@@ -1,0 +1,27 @@
+source,full_dataset_runs,selected_runs,selected_share,full_share
+Glaive Code Assistant,9642,,,0.0082
+Inferred Bugs,22434,5000.0,0.0508,0.0191
+MagiCoder Evol Instruct,100,,,0.0001
+Nemotron Prism,6931,44.0,0.0004,0.0059
+Qasper,16305,5416.0,0.055,0.0139
+SWEGym,3812,,,0.0032
+Self-Instruct Naive,9626,,,0.0082
+StackExchange Overflow,23404,5000.0,0.0508,0.0199
+WikiTable Format Conversion,1927,72.0,0.0007,0.0016
+bash textbook,9998,1542.0,0.0157,0.0085
+code_contests,22915,63.0,0.0006,0.0195
+codeforces,26911,18.0,0.0002,0.0229
+defects 4j,15806,5582.0,0.0567,0.0135
+exp_tas,332969,15873.0,0.1611,0.2835
+freelancer,235094,4999.0,0.0508,0.2002
+gsm8k,50,,,0.0
+math,9994,88.0,0.0009,0.0085
+neulab,55200,4999.0,0.0508,0.047
+nl2bash,36387,5000.0,0.0508,0.031
+puzzles,28867,1939.0,0.0197,0.0246
+r2egym,26720,5000.0,0.0508,0.0228
+stack_exchange,115813,22458.0,0.228,0.0986
+staqc,19102,22.0,0.0002,0.0163
+swesmith,59758,4894.0,0.0497,0.0509
+taskmaster,45227,5000.0,0.0508,0.0385
+unknown,39427,5492.0,0.0558,0.0336

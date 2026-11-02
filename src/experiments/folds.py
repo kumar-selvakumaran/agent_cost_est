@@ -36,3 +36,11 @@ class FoldData:
         roles = [roles] if isinstance(roles, str) else roles
         m = np.isin(self.role, roles)
         return Bundle(self.X[m].reset_index(drop=True), self.y[m], self.meta[m].reset_index(drop=True), self.Xd[m])
+
+
+def _bundle_mask(self, m) -> Bundle:
+    m = np.asarray(m)
+    return Bundle(self.X[m].reset_index(drop=True), self.y[m], self.meta[m].reset_index(drop=True), self.Xd[m])
+
+
+FoldData.bundle_mask = _bundle_mask

@@ -60,7 +60,7 @@ def main():
 
     # 1. level decomposition
     lv = fit_level_mixed(X)
-    boots = Parallel(n_jobs=4)(delayed(_boot_level)(X, base + b) for b in range(Bm))
+    boots = Parallel(n_jobs=4, verbose=5)(delayed(_boot_level)(X, base + b) for b in range(Bm))
     boots = [b for b in boots if b is not None]
     rows = []
     for k in ["model", "task", "cell", "run"]:
@@ -78,7 +78,7 @@ def main():
     n_zero = int((cells.s < 1e-6).sum())
     cells["log_s"] = np.log(cells.s.clip(lower=1e-3))
     sp = fit_spread_mixed(cells)
-    sboots = Parallel(n_jobs=4)(delayed(_boot_spread)(cells, base + 10_000 + b) for b in range(Bm))
+    sboots = Parallel(n_jobs=4, verbose=5)(delayed(_boot_spread)(cells, base + 10_000 + b) for b in range(Bm))
     sboots = [b for b in sboots if b is not None]
     rows = []
     for k in ["model", "task", "residual"]:

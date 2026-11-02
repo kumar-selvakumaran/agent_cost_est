@@ -1,0 +1,2 @@
+hypothesis,verdict,stat,est,lo,hi
+H1,not supported,"task share - model share (spread, noise-corrected)",-0.3628034704385503,-0.41889562244580536,-0.32151709341021983

@@ -269,7 +269,7 @@ def main():
                    sources=ok.source.nunique(), crossed_tasks=int((nm >= 2).sum()),
                    runs_from_crossed=float(ok.task_id.isin(nm[nm >= 2].index).mean()),
                    cells_ge6=int((cn >= 6).sum()), cells_ge10=int((cn >= 10).sum()), cells_ge20=int((cn >= 20).sum()),
-                   split_groups=ok.split_group.nunique())
+                   split_groups=ok.split_group.nunique(), summarization_flag_share=float(ok.summ_flag.mean()))
     pd.Series(summary).to_csv("results/tables/e0_sample_summary.csv", header=["value"])
     L.append("## Final sample\n")
     L.append(pd.Series(summary).to_frame("value").to_markdown() + "\n")

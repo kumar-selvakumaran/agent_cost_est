@@ -92,6 +92,8 @@ def main():
     fig.savefig("results/figures/fig_e7_rolling_coverage.png")
     plt.close(fig)
     te_src = R.loc[rid_te].source.value_counts().to_dict()
+    pd.DataFrame([dict(cut_date=str(cut)[:10], n_train=ntr, n_test=nte, n_removed=nrem, method=method,
+                       **{f"test_runs_{k}": v for k, v in te_src.items()})]).to_csv("results/tables/e7_design.csv", index=False)
     L = ["# E7 — Distribution shift and ACI\n",
          f"Temporal split (date coverage 100%): training = runs dated ≤ {cut} (70th percentile, n = {ntr:,}); test = "
          f"later runs whose task (CV group) never appears in training (n = {nte:,}; {nrem:,} later runs removed because "

@@ -54,6 +54,9 @@ def main():
     c4 = c4[c4.model_id.isin(keep_models)]
     nm = c4.groupby("task_id").model_id.nunique()
     X = c4[c4.task_id.isin(nm[nm >= 2].index)].copy()
+    pd.DataFrame([dict(n_tasks=X.task_id.nunique(), n_cells=X.cell_id.nunique(), n_runs=len(X),
+                       **{f"runs_{m}": int(v) for m, v in X.model_id.value_counts().items()})]).to_csv(
+        "results/tables/e2_design.csv", index=False)
     L.append(f"Crossed design: tasks with ≥ 2 models each having ≥ 4 runs. Models with < 20 such cells are dropped "
              f"for identifiability ({', '.join(dropped) or 'none'}). n tasks = {X.task_id.nunique():,}, cells = "
              f"{X.cell_id.nunique():,}, runs = {len(X):,}; models: {X.model_id.value_counts().to_dict()}.\n")

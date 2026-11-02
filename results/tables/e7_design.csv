@@ -1,0 +1,2 @@
+cut_date,n_train,n_test,n_removed,method,test_runs_unknown,test_runs_taskmaster,test_runs_swesmith,test_runs_r2egym
+2025-12-24,68951,7339,22211,P5,4868,1442,915,114

@@ -121,6 +121,8 @@ def main():
     m = tab.p_vs_P1.notna()
     tab.loc[m, "p_holm"] = holm(tab.loc[m, "p_vs_P1"].values)
     tab.to_csv("results/tables/e4_warm.csv", index=False)
+    pd.DataFrame([dict(n_runs=len(ids), n_tasks=len(set(task)), n_cells=r.loc[ids, "cell_id"].nunique(),
+                       n_runs_oracle=int(has_or.sum()))]).to_csv("results/tables/e4_design.csv", index=False)
     # paired history vs no history
     cw = task_cluster_indices(task, B, seed)
     pr = []

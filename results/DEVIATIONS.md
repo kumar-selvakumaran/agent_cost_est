@@ -83,3 +83,27 @@ The rule applied under ambiguity: choose the most conservative option (least lea
 23. `turns.parquet` additionally stores `n_tok = I_k + O_k`, cumulative tokens `cum_tokens` (N_k) and `I_next`
     (I_{k+1}; null after the last call). Additive only; no base quantity changed.
 24. Prediction files carry a `k` column (0 for pre-run forecasts) in addition to the spec's columns.
+
+## Experiments
+25. **Verdict rules (fixed before results were seen, in code):** H2 supported if the best-on-validation method beats P1
+    with Holm p < 0.05; H3 supported only if all three non-Gaussian methods (P3-EVT, P4, P5) have significantly lower
+    PIT KS than P2, not supported if none does, inconclusive otherwise; H4 supported if O2's QCRPS decreases at every
+    grid k in both populations (eligible and fixed panel), inconclusive if in only one; H6 compares the relative gain of
+    the best history model (E4 test runs) with that of the best E3 method (all runs) via independent bootstrap draws.
+26. **E3 best method** = lowest task-weighted validation QCRPS averaged over folds among P2–P6 (P5). CQR(best) =
+    CQR(P5).
+27. **E4 P1** is the E3 P1 forecast restricted to the S2 target runs (P1 has no history variant). P4 in E4 uses one
+    seed. The oracle is computed on cells with ≥ 10 runs; gap-closed is reported on that subset.
+28. **E5 eligible population** at k uses all runs with K > k; the k = 0 reference is the E3 out-of-fold P5 forecast
+    on exactly the same runs (ratios are paired). The fixed panel is K ≥ 33 (spec: K > 32).
+29. **E7** uses the best S1 method (P5) refit once on the temporal training set (single seed), with a 70/15/15
+    fit/val/cal split by task group inside it.
+30. **E8 kill rule.** A run is killed at the end of the first turn whose cumulative cost exceeds the cap, unless that
+    turn is the run's last (then it finished anyway). Caps for P1 use its raw upper quantile; for the best method the
+    one-sided CQR upper quantile (calibrated per fold, one run per task). τ = 0.8 was added to CQR's one-sided levels.
+    Outcome = exploratory `completed` proxy (spec label degenerate, item 3).
+31. **E1 bootstrap CIs** for within-cell spread and bimodality resample cells (each cell belongs to one task in the
+    statistic's population, so this is the cluster bootstrap); Hill and scaling CIs resample tasks.
+32. **E6 skipped**: `llm_predictor.enabled` is false by default and no API key is configured (spec A.8); H5 = skipped.
+33. **Optional `h_last1`/`h_last5` history variant** (§6.2) not run: E0 did not establish that `date` orders runs
+    within a cell (dates are per job batch for many sources).
